@@ -1,7 +1,10 @@
-using System;
+﻿using System;
 using System.Net.Http.Headers;
 using System.IO;
 
+// Переделать вывод, чтобы все выводилось в один файл (возможно даже убрать вывод промежуточных шагов, оставить только начальную матрицу и решение)
+// Сделать какие то погрешности или че там еще короче хуйню какую то еще сделать
+// Сделать тесты на разные размеры матрицы и разные границы генерации значений
 class Program
 {
     static void Main()
@@ -24,5 +27,8 @@ class Program
         StreamWriter step2 = new StreamWriter("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\step2.txt");
         matrix.PrintMatrixToFile(step2);
         step2.Close();
+
+        matrix.StepThird();
+        matrix.PrintSolutionToConsole();
     }
 }

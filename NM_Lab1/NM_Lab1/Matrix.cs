@@ -1,4 +1,4 @@
-// Систему уравнений задают шесть векторов: a, b, c, f, p, q
+﻿// Систему уравнений задают шесть векторов: a, b, c, f, p, q
 // a, b, c - векторы для элементов матрицы А, расположенных на нижней кодиагонали, на главной диагонали и на верхней диагонали
 // p, q - векторы для элементов k-й строки и k-ого столбца матрицы А (1 < k < n)
 // f - вектор правой части системы уравнений
@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.Design;
 
 class Matrix
 {
@@ -117,28 +118,33 @@ class Matrix
         this.right = right;
     }
 
-    //Доделать преобразования для вектора f
     public void StepFirst()
     {
         for (int row = 0; row < numberK - 1 - 1; row++)
         {
-            double koef = vectorB[row];
-            vectorB[row] /= koef;
-            vectorC[row] /= koef;
-            vectorQ[row] /= koef;
+            double koef = vectorB[row]; 
+            vectorB[row] /= koef; 
+            vectorC[row] /= koef; 
+            vectorQ[row] /= koef; 
+            vectorF[row] /= koef; 
 
-            koef = vectorA[row + 1];
-            vectorA[row + 1] -= koef * vectorB[row];
-            vectorB[row + 1] -= koef * vectorC[row];
-            vectorQ[row + 1] -= koef * vectorQ[row];
+            koef = vectorA[row + 1]; 
+            vectorA[row + 1] -= koef * vectorB[row]; 
+            vectorB[row + 1] -= koef * vectorC[row]; 
+            vectorQ[row + 1] -= koef * vectorQ[row]; 
+            vectorF[row + 1] -= koef * vectorF[row]; 
 
-            koef = vectorP[matrixSize - 1 - row];
-            vectorP[matrixSize - 1 - row] -= koef * vectorB[row];
-            vectorP[matrixSize - 1 - row - 1] -= koef * vectorC[row];
+            koef = vectorP[matrixSize - 1 - row]; 
+            vectorP[matrixSize - 1 - row] -= koef * vectorB[row]; 
+            vectorP[matrixSize - 1 - row - 1] -= koef * vectorC[row]; 
+            vectorF[numberK - 1] -= koef * vectorF[row];
+            vectorQ[numberK - 1] -= koef * vectorQ[row];
+            vectorA[numberK - 1] = vectorQ[numberK - 1];
+            vectorP[numberK - 1] = vectorQ[numberK - 1];
+            vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
+            vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
         }
     }
-
-    //Доделать преобразования для вектора f
     public void StepSecond()
     {
         for (int row = matrixSize - 1; row > numberK - 1; row--)
@@ -147,32 +153,53 @@ class Matrix
             vectorB[row] /= koef;
             vectorA[row] /= koef;
             vectorQ[row] /= koef;
+            vectorF[row] /= koef;
 
             koef = vectorC[row - 1];
             vectorC[row - 1] -= koef * vectorB[row];
             vectorB[row - 1] -= koef * vectorA[row];
             vectorQ[row - 1] -= koef * vectorQ[row];
+            vectorF[row - 1] -= koef * vectorF[row];
 
             koef = vectorP[matrixSize - 1 - row];
             vectorP[matrixSize - 1 - row] -= koef * vectorB[row];
             vectorP[matrixSize - 1 - row + 1] -= koef * vectorA[row];
+            vectorF[numberK - 1] -= koef * vectorF[row];
+            vectorQ[numberK - 1] -= koef * vectorQ[row];
+            vectorA[numberK - 1] = vectorQ[numberK - 1];
+            vectorP[numberK - 1] = vectorQ[numberK - 1];
+            vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
+            vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+            vectorB[numberK - 1] = vectorP[numberK - 1 - 1];
         }
-
         double koef_dop = vectorB[numberK - 1];
         vectorB[numberK - 1] /= koef_dop;
         vectorP[numberK - 1 - 1] = vectorB[numberK - 1];
-
+        vectorQ[numberK - 1] /= koef_dop;
+        vectorP[numberK - 1] = vectorQ[numberK - 1];
+        vectorA[numberK - 1] = vectorQ[numberK - 1];
         koef_dop = vectorC[numberK - 1 - 1];
         vectorC[numberK - 1 - 1] -= koef_dop * vectorB[numberK - 1];
+        vectorQ[numberK - 1 - 1] -= koef_dop * vectorQ[numberK - 1];
+        vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+        vectorF[numberK - 1 - 1] -= koef_dop * vectorF[numberK - 1];
     }
 
-    //Шаг 3: начинаем искать решения
     public void StepThird()
     {
+        vectorX[numberK - 1] = vectorF[numberK - 1 - 1] / vectorQ[numberK - 1 - 1];
+        vectorX[numberK - 1 + 1] = vectorF[numberK - 1 - 2] - vectorQ[numberK - 1 - 2] * vectorX[numberK - 1];
+        vectorX[numberK - 1 - 1] = vectorF[numberK - 1] - vectorQ[numberK - 1] * vectorX[numberK - 1];
 
+        for (int row = numberK - 1 - 3; row >= 0; row--)
+        {
+            vectorX[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorX[numberK - 1] - vectorC[row] * vectorX[matrixSize - 1 - row - 1];
+        }
+        for (int row = numberK - 1 + 1; row < matrixSize; row++)
+        {
+            vectorX[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorX[numberK - 1] - vectorA[row] * vectorX[matrixSize - 1 - row + 1];
+        }
     }
-
-    //Сделать вывод для вектора f
     public void PrintMatrixToFile(StreamWriter sw)
     {
         sw.WriteLine("Matrix Size: " + matrixSize);
@@ -208,8 +235,17 @@ class Matrix
                     sw.Write(String.Format("{0:f12}  ", 0.0));
                 }
             }
+            sw.Write(String.Format("  =  {0:f12}  ", vectorF[row]));
             end_col--;
             sw.WriteLine();
+        }
+    }
+
+    public void PrintSolutionToConsole()
+    {
+        for (int i = 0; i < matrixSize; i++)
+        {
+            Console.WriteLine(String.Format("X{0} = {1:f12}", i, vectorX[i]));
         }
     }
 }
