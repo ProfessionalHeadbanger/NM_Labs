@@ -33,6 +33,7 @@ class Matrix
     private double[]? vectorP;
     private double[]? vectorQ;
     private double[]? vectorX;
+    private double[]? vectorSolutions;
     private int matrixSize;
     private int numberK;
     private double left;
@@ -52,7 +53,9 @@ class Matrix
         vectorP = new double[matrixSize];
         vectorQ = new double[matrixSize];
         vectorX = new double[matrixSize];
+        vectorSolutions = new double[matrixSize];
 
+        //Дописать генерацию значений вектора F как сумму произведений сгенерированных Х на их коэффициенты из других векторов
         for (int row = 0; row < matrixSize; row++)
         {
             for (int col = 0; col < matrixSize; col++)
@@ -110,8 +113,10 @@ class Matrix
                         vectorQ[numberK - 1] = vectorP[numberK - 1];
                     }
                 }
+                
             }
-            vectorF[row] = left + random.NextDouble() * (right - left);
+            
+            vectorX[row] = left + random.NextDouble() * (right - left);
         }
 
         this.left = left;
@@ -187,17 +192,17 @@ class Matrix
 
     public void StepThird()
     {
-        vectorX[numberK - 1] = vectorF[numberK - 1 - 1] / vectorQ[numberK - 1 - 1];
-        vectorX[numberK - 1 + 1] = vectorF[numberK - 1 - 2] - vectorQ[numberK - 1 - 2] * vectorX[numberK - 1];
-        vectorX[numberK - 1 - 1] = vectorF[numberK - 1] - vectorQ[numberK - 1] * vectorX[numberK - 1];
+        vectorSolutions[numberK - 1] = vectorF[numberK - 1 - 1] / vectorQ[numberK - 1 - 1];
+        vectorSolutions[numberK - 1 + 1] = vectorF[numberK - 1 - 2] - vectorQ[numberK - 1 - 2] * vectorSolutions[numberK - 1];
+        vectorSolutions[numberK - 1 - 1] = vectorF[numberK - 1] - vectorQ[numberK - 1] * vectorSolutions[numberK - 1];
 
         for (int row = numberK - 1 - 3; row >= 0; row--)
         {
-            vectorX[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorX[numberK - 1] - vectorC[row] * vectorX[matrixSize - 1 - row - 1];
+            vectorSolutions[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorSolutions[numberK - 1] - vectorC[row] * vectorSolutions[matrixSize - 1 - row - 1];
         }
         for (int row = numberK - 1 + 1; row < matrixSize; row++)
         {
-            vectorX[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorX[numberK - 1] - vectorA[row] * vectorX[matrixSize - 1 - row + 1];
+            vectorSolutions[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorSolutions[numberK - 1] - vectorA[row] * vectorSolutions[matrixSize - 1 - row + 1];
         }
     }
     public void PrintMatrixToFile(StreamWriter sw)
@@ -245,7 +250,7 @@ class Matrix
     {
         for (int i = 0; i < matrixSize; i++)
         {
-            Console.WriteLine(String.Format("X{0} = {1:f12}", i, vectorX[i]));
+            Console.WriteLine(String.Format("X{0} = {1:f12}", i, vectorSolutions[i]));
         }
     }
 }
