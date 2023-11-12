@@ -55,7 +55,11 @@ class Matrix
         vectorX = new double[matrixSize];
         vectorSolutions = new double[matrixSize];
 
-        //Дописать генерацию значений вектора F как сумму произведений сгенерированных Х на их коэффициенты из других векторов
+        for (int i = 0; i < matrixSize; i++)
+        {
+            vectorX[i] = left + random.NextDouble() * (right - left);
+        }
+
         for (int row = 0; row < matrixSize; row++)
         {
             for (int col = 0; col < matrixSize; col++)
@@ -64,38 +68,7 @@ class Matrix
                 {
                     vectorQ[row] = left + random.NextDouble() * (right - left);
                 }
-                if (row == 0)
-                {
-                    vectorA[row] = 0;
-                    vectorB[row] = left + random.NextDouble() * (right - left);
-                    vectorC[row] = left + random.NextDouble() * (right - left);
-                }
-                if ((row >= 1 && row <= numberK - 1 - 3) || (row >= numberK - 1 + 1 && row <= matrixSize - 1 - 1))
-                {
-                    vectorA[row] = left + random.NextDouble() * (right - left);
-                    vectorB[row] = left + random.NextDouble() * (right - left);
-                    vectorC[row] = left + random.NextDouble() * (right - left);
-                }
-                if (row == matrixSize - 1)
-                {
-                    vectorA[row] = left + random.NextDouble() * (right - left);
-                    vectorB[row] = left + random.NextDouble() * (right - left);
-                    vectorC[row] = 0;
-                }
-                if (row >= numberK - 1 - 2 && row <= numberK - 1 - 1)
-                {
-                    vectorA[row] = left + random.NextDouble() * (right - left);
-                    vectorB[row] = left + random.NextDouble() * (right - left);
-                    vectorC[row] = left + random.NextDouble() * (right - left);
-                    if (row == numberK - 1 - 2)
-                    {
-                        vectorQ[row] = vectorC[row];
-                    }
-                    if (row == numberK - 1 - 1)
-                    {
-                        vectorQ[row] = vectorB[row];
-                    }
-                }
+                
                 if (row == numberK - 1)
                 {
                     vectorP[col] = left + random.NextDouble() * (right - left);
@@ -113,98 +86,162 @@ class Matrix
                         vectorQ[numberK - 1] = vectorP[numberK - 1];
                     }
                 }
-                
             }
-            
-            vectorX[row] = left + random.NextDouble() * (right - left);
+        }
+
+        for (int row = 0; row < matrixSize; row++)
+        {
+            if (row == 0)
+            {
+                vectorA[row] = 0;
+                vectorB[row] = left + random.NextDouble() * (right - left);
+                vectorC[row] = left + random.NextDouble() * (right - left);
+                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row];
+            }
+            if ((row >= 1 && row <= numberK - 1 - 3) || (row >= numberK - 1 + 1 && row <= matrixSize - 1 - 1))
+            {
+                vectorA[row] = left + random.NextDouble() * (right - left);
+                vectorB[row] = left + random.NextDouble() * (right - left);
+                vectorC[row] = left + random.NextDouble() * (right - left);
+                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
+            }
+            if (row == matrixSize - 1)
+            {
+                vectorA[row] = left + random.NextDouble() * (right - left);
+                vectorB[row] = left + random.NextDouble() * (right - left);
+                vectorC[row] = 0;
+                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
+            }
+            if (row >= numberK - 1 - 2 && row <= numberK - 1 - 1)
+            {
+                if (row == numberK - 1 - 2)
+                {
+                    vectorC[row] = vectorQ[row];
+                    vectorA[row] = left + random.NextDouble() * (right - left);
+                    vectorB[row] = left + random.NextDouble() * (right - left);
+                }
+                if (row == numberK - 1 - 1)
+                {
+                    vectorB[row] = vectorQ[row];
+                    vectorA[row] = left + random.NextDouble() * (right - left);
+                    vectorC[row] = left + random.NextDouble() * (right - left);
+                }
+                
+                vectorF[row] = vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
+            }
+            if (row == numberK - 1)
+            {
+                for (int col = 0; col < matrixSize; col++)
+                {
+                    vectorF[row] += vectorP[col] * vectorX[col];
+                }
+            }
         }
 
         this.left = left;
         this.right = right;
     }
 
-    public void StepFirst()
+    public void FindSolutions()
     {
-        for (int row = 0; row < numberK - 1 - 1; row++)
+        for (int row = 0; row < numberK - 1 - 2; row++)
         {
-            double koef = vectorB[row]; 
-            vectorB[row] /= koef; 
-            vectorC[row] /= koef; 
-            vectorQ[row] /= koef; 
-            vectorF[row] /= koef; 
+            vectorQ[row] /= vectorB[row];
+            vectorC[row] /= vectorB[row];
+            vectorF[row] /= vectorB[row];
+            vectorB[row] /= vectorB[row];
 
-            koef = vectorA[row + 1]; 
-            vectorA[row + 1] -= koef * vectorB[row]; 
-            vectorB[row + 1] -= koef * vectorC[row]; 
-            vectorQ[row + 1] -= koef * vectorQ[row]; 
-            vectorF[row + 1] -= koef * vectorF[row]; 
+            vectorQ[row + 1] -= vectorQ[row] * vectorA[row + 1];
+            vectorB[row + 1] -= vectorC[row] * vectorA[row + 1];
+            vectorF[row + 1] -= vectorF[row] * vectorA[row + 1];
+            vectorA[row + 1] -= vectorB[row] * vectorA[row + 1];
 
-            koef = vectorP[matrixSize - 1 - row]; 
-            vectorP[matrixSize - 1 - row] -= koef * vectorB[row]; 
-            vectorP[matrixSize - 1 - row - 1] -= koef * vectorC[row]; 
-            vectorF[numberK - 1] -= koef * vectorF[row];
-            vectorQ[numberK - 1] -= koef * vectorQ[row];
-            vectorA[numberK - 1] = vectorQ[numberK - 1];
-            vectorP[numberK - 1] = vectorQ[numberK - 1];
-            vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
-            vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+            vectorP[numberK - 1] -= vectorQ[row] * vectorP[matrixSize - 1 - row];
+            vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
+            vectorP[matrixSize - 1 - row - 1] -= vectorC[row] * vectorP[matrixSize - 1 - row];
+            vectorF[numberK - 1] -= vectorF[row] * vectorP[matrixSize - 1 - row];
+            vectorP[matrixSize - 1 - row] -= vectorB[row] * vectorP[matrixSize - 1 - row]; 
         }
-    }
-    public void StepSecond()
-    {
-        for (int row = matrixSize - 1; row > numberK - 1; row--)
+
+        for (int row = matrixSize - 1; row > numberK - 1 + 1; row--)
         {
-            double koef = vectorB[row];
-            vectorB[row] /= koef;
-            vectorA[row] /= koef;
-            vectorQ[row] /= koef;
-            vectorF[row] /= koef;
+            vectorQ[row] /= vectorB[row];
+            vectorA[row] /= vectorB[row];
+            vectorF[row] /= vectorB[row];
+            vectorB[row] /= vectorB[row];
 
-            koef = vectorC[row - 1];
-            vectorC[row - 1] -= koef * vectorB[row];
-            vectorB[row - 1] -= koef * vectorA[row];
-            vectorQ[row - 1] -= koef * vectorQ[row];
-            vectorF[row - 1] -= koef * vectorF[row];
+            vectorQ[row - 1] -= vectorQ[row] * vectorC[row - 1];
+            vectorB[row - 1] -= vectorA[row] * vectorC[row - 1];
+            vectorF[row - 1] -= vectorF[row] * vectorC[row - 1];
+            vectorC[row - 1] -= vectorB[row] * vectorC[row - 1];
 
-            koef = vectorP[matrixSize - 1 - row];
-            vectorP[matrixSize - 1 - row] -= koef * vectorB[row];
-            vectorP[matrixSize - 1 - row + 1] -= koef * vectorA[row];
-            vectorF[numberK - 1] -= koef * vectorF[row];
-            vectorQ[numberK - 1] -= koef * vectorQ[row];
-            vectorA[numberK - 1] = vectorQ[numberK - 1];
-            vectorP[numberK - 1] = vectorQ[numberK - 1];
-            vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
-            vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
-            vectorB[numberK - 1] = vectorP[numberK - 1 - 1];
+            vectorP[numberK - 1] -= vectorQ[row] * vectorP[matrixSize - 1 - row];
+            vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
+            vectorP[matrixSize - 1 - row + 1] -= vectorA[row] * vectorP[matrixSize - 1 - row];
+            vectorF[numberK - 1] -= vectorF[row] * vectorP[matrixSize - 1 - row];
+            vectorP[matrixSize - 1 - row] -= vectorB[row] * vectorP[matrixSize - 1 - row];
         }
-        double koef_dop = vectorB[numberK - 1];
-        vectorB[numberK - 1] /= koef_dop;
-        vectorP[numberK - 1 - 1] = vectorB[numberK - 1];
-        vectorQ[numberK - 1] /= koef_dop;
-        vectorP[numberK - 1] = vectorQ[numberK - 1];
-        vectorA[numberK - 1] = vectorQ[numberK - 1];
-        koef_dop = vectorC[numberK - 1 - 1];
-        vectorC[numberK - 1 - 1] -= koef_dop * vectorB[numberK - 1];
-        vectorQ[numberK - 1 - 1] -= koef_dop * vectorQ[numberK - 1];
+
+        vectorQ[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
+        vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
+        vectorF[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
+        vectorB[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
+
+        vectorQ[numberK - 1 - 1] -= vectorQ[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
         vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
-        vectorF[numberK - 1 - 1] -= koef_dop * vectorF[numberK - 1];
-    }
+        vectorF[numberK - 1 - 1] -= vectorF[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
+        vectorA[numberK - 1 - 1] -= vectorB[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
 
-    public void StepThird()
-    {
-        vectorSolutions[numberK - 1] = vectorF[numberK - 1 - 1] / vectorQ[numberK - 1 - 1];
-        vectorSolutions[numberK - 1 + 1] = vectorF[numberK - 1 - 2] - vectorQ[numberK - 1 - 2] * vectorSolutions[numberK - 1];
-        vectorSolutions[numberK - 1 - 1] = vectorF[numberK - 1] - vectorQ[numberK - 1] * vectorSolutions[numberK - 1];
+        vectorP[numberK - 1] -= vectorQ[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
+        vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
+        vectorF[numberK - 1] -= vectorF[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
+        vectorP[numberK - 1 + 1] -= vectorB[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
 
-        for (int row = numberK - 1 - 3; row >= 0; row--)
-        {
-            vectorSolutions[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorSolutions[numberK - 1] - vectorC[row] * vectorSolutions[matrixSize - 1 - row - 1];
-        }
-        for (int row = numberK - 1 + 1; row < matrixSize; row++)
-        {
-            vectorSolutions[matrixSize - 1 - row] = vectorF[row] - vectorQ[row] * vectorSolutions[numberK - 1] - vectorA[row] * vectorSolutions[matrixSize - 1 - row + 1];
-        }
+        vectorC[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+        vectorF[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
+        vectorQ[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
+        vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+
+        vectorB[numberK - 1] -= vectorC[numberK - 1 - 1] * vectorP[numberK - 1];
+        vectorF[numberK - 1] -= vectorF[numberK - 1 - 1] * vectorP[numberK - 1];
+        vectorP[numberK - 1] -= vectorQ[numberK - 1 - 1] * vectorP[numberK - 1];
+        vectorA[numberK - 1] = vectorQ[numberK - 1] = vectorP[numberK - 1];
+
+        vectorA[numberK - 1 + 1] -= vectorC[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
+        vectorF[numberK - 1 + 1] -= vectorF[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
+        vectorQ[numberK - 1 + 1] -= vectorQ[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
+
+        vectorA[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
+        vectorF[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
+        vectorB[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
+
+        vectorP[numberK - 1 - 1] -= vectorA[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
+        vectorB[numberK - 1] = vectorP[numberK - 1 - 1];
+        vectorF[numberK - 1] -= vectorF[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
+        vectorP[numberK - 1 - 2] -= vectorB[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
+        vectorC[numberK - 1] = vectorP[numberK - 1 - 2];
+
+        vectorF[numberK - 1] /= vectorB[numberK - 1];
+        vectorB[numberK - 1] /= vectorB[numberK - 1];
+        vectorP[numberK - 1 - 1] = vectorB[numberK - 1];
+
+        vectorF[numberK - 1 - 1] -= vectorF[numberK - 1] * vectorC[numberK - 1 - 1];
+        vectorC[numberK - 1 - 1] -= vectorB[numberK - 1] * vectorC[numberK - 1 - 1];
+
+        vectorF[numberK - 1 - 2] -= vectorF[numberK - 1 - 1] * vectorQ[numberK - 1 - 2];
+        vectorQ[numberK - 1 - 2] -= vectorQ[numberK - 1 - 1] * vectorQ[numberK - 1 - 2];
+        vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
+
+        vectorF[numberK - 1 + 1] -= vectorF[numberK - 1] * vectorA[numberK - 1 + 1];
+        vectorA[numberK - 1 + 1] -= vectorB[numberK - 1] * vectorA[numberK - 1 + 1];
+
+        vectorSolutions[numberK - 1 + 1] = vectorF[numberK - 1 - 2];
+        vectorSolutions[numberK - 1] = vectorF[numberK - 1 - 1];
+        vectorSolutions[numberK - 1 - 1] = vectorF[numberK - 1];
+        vectorSolutions[numberK - 1 - 2] = vectorF[numberK - 1 + 1];
     }
+    
+
     public void PrintMatrixToFile(StreamWriter sw)
     {
         sw.WriteLine("Matrix Size: " + matrixSize);
