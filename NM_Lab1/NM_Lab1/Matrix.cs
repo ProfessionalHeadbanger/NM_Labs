@@ -36,10 +36,8 @@ class Matrix
     private double[]? vectorSolutions;
     private int matrixSize;
     private int numberK;
-    private double left;
-    private double right;
 
-    public Matrix(int matrixSize, int numberK, double left, double right)
+    public Matrix(int matrixSize, int numberK, int left, int right)
     {
         this.matrixSize = matrixSize;
         this.numberK = numberK;
@@ -57,7 +55,7 @@ class Matrix
 
         for (int i = 0; i < matrixSize; i++)
         {
-            vectorX[i] = left + random.NextDouble() * (right - left);
+            vectorX[i] = left + random.Next(left, right);
         }
 
         for (int row = 0; row < matrixSize; row++)
@@ -66,12 +64,12 @@ class Matrix
             {
                 if (col == numberK - 1)
                 {
-                    vectorQ[row] = left + random.NextDouble() * (right - left);
+                    vectorQ[row] = left + random.Next(left, right);
                 }
                 
                 if (row == numberK - 1)
                 {
-                    vectorP[col] = left + random.NextDouble() * (right - left);
+                    vectorP[col] = left + random.Next(left, right);
                     if (col == numberK - 1 - 2)
                     {
                         vectorC[numberK - 1] = vectorP[numberK - 1 - 2];
@@ -94,21 +92,21 @@ class Matrix
             if (row == 0)
             {
                 vectorA[row] = 0;
-                vectorB[row] = left + random.NextDouble() * (right - left);
-                vectorC[row] = left + random.NextDouble() * (right - left);
+                vectorB[row] = left + random.Next(left, right);
+                vectorC[row] = left + random.Next(left, right);
                 vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row];
             }
             if ((row >= 1 && row <= numberK - 1 - 3) || (row >= numberK - 1 + 1 && row <= matrixSize - 1 - 1))
             {
-                vectorA[row] = left + random.NextDouble() * (right - left);
-                vectorB[row] = left + random.NextDouble() * (right - left);
-                vectorC[row] = left + random.NextDouble() * (right - left);
+                vectorA[row] = left + random.Next(left, right);
+                vectorB[row] = left + random.Next(left, right);
+                vectorC[row] = left + random.Next(left, right);
                 vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
             }
             if (row == matrixSize - 1)
             {
-                vectorA[row] = left + random.NextDouble() * (right - left);
-                vectorB[row] = left + random.NextDouble() * (right - left);
+                vectorA[row] = left + random.Next(left, right);
+                vectorB[row] = left + random.Next(left, right);
                 vectorC[row] = 0;
                 vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
             }
@@ -117,14 +115,14 @@ class Matrix
                 if (row == numberK - 1 - 2)
                 {
                     vectorC[row] = vectorQ[row];
-                    vectorA[row] = left + random.NextDouble() * (right - left);
-                    vectorB[row] = left + random.NextDouble() * (right - left);
+                    vectorA[row] = left + random.Next(left, right);
+                    vectorB[row] = left + random.Next(left, right);
                 }
                 if (row == numberK - 1 - 1)
                 {
                     vectorB[row] = vectorQ[row];
-                    vectorA[row] = left + random.NextDouble() * (right - left);
-                    vectorC[row] = left + random.NextDouble() * (right - left);
+                    vectorA[row] = left + random.Next(left, right);
+                    vectorC[row] = left + random.Next(left, right);
                 }
                 
                 vectorF[row] = vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
@@ -137,9 +135,6 @@ class Matrix
                 }
             }
         }
-
-        this.left = left;
-        this.right = right;
     }
 
     public void FindSolutions()
@@ -197,7 +192,7 @@ class Matrix
         vectorF[numberK - 1] -= vectorF[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
         vectorP[numberK - 1 + 1] -= vectorB[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
 
-        vectorC[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
+        vectorC[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
         vectorF[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
         vectorQ[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
         vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
@@ -254,30 +249,30 @@ class Matrix
             {
                 if (col == numberK - 1)
                 {
-                    sw.Write(String.Format("{0:f12}  ", vectorQ[row]));
+                    sw.Write(String.Format("{0:f1}  ", vectorQ[row]));
                 }
                 else if (row == numberK - 1)
                 {
-                    sw.Write(String.Format("{0:f12}  ", vectorP[col]));
+                    sw.Write(String.Format("{0:f1}  ", vectorP[col]));
                 }
                 else if (col == end_col - 1)
                 {
-                    sw.Write(String.Format("{0:f12}  ", vectorC[row]));
+                    sw.Write(String.Format("{0:f1}  ", vectorC[row]));
                 }
                 else if (col == end_col)
                 {
-                    sw.Write(String.Format("{0:f12}  ", vectorB[row]));
+                    sw.Write(String.Format("{0:f1}  ", vectorB[row]));
                 }
                 else if (col == end_col + 1)
                 {
-                    sw.Write(String.Format("{0:f12}  ", vectorA[row]));
+                    sw.Write(String.Format("{0:f1}  ", vectorA[row]));
                 }
                 else
                 {
-                    sw.Write(String.Format("{0:f12}  ", 0.0));
+                    sw.Write(String.Format("{0:f1}  ", 0.0));
                 }
             }
-            sw.Write(String.Format("  =  {0:f12}  ", vectorF[row]));
+            sw.Write(String.Format("  =  {0:f1}  ", vectorF[row]));
             end_col--;
             sw.WriteLine();
         }
@@ -287,7 +282,7 @@ class Matrix
     {
         for (int i = 0; i < matrixSize; i++)
         {
-            Console.WriteLine(String.Format("X{0} = {1:f12}", i, vectorSolutions[i]));
+            Console.WriteLine(String.Format("X{0} = {1:f1}", i, vectorSolutions[i]));
         }
     }
 }
