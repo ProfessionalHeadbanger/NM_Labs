@@ -13,16 +13,20 @@ class Program
         int n = Convert.ToInt32(Console.ReadLine());
         int k = n / 2 + 1;
 
-        Matrix matrix = new Matrix(n, k, 1, 5);
-        StreamWriter initialMatrix = new StreamWriter("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\initialMatrix.txt");
-        matrix.PrintMatrixToFile(initialMatrix);
-        initialMatrix.Close();
+        Matrix m = new Matrix(n, k);
+        m.InputFromFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\test.txt");
+        m.PrintToConsole();
 
-        matrix.FindSolutions();
-        StreamWriter step1 = new StreamWriter("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\step1.txt");
-        matrix.PrintMatrixToFile(step1);
-        step1.Close();
+        m.FirstStep();
+        m.PrintToConsole();
 
-       
+        m.SecondStep();
+        m.PrintToConsole();
+
+        m.ThirdStep();
+        m.PrintToConsole();
+
+        m.FourthStep();
+        m.PrintToConsole();
     }
 }

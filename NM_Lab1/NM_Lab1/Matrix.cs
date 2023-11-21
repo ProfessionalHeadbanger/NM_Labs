@@ -23,266 +23,221 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.Design;
+using System.Data;
+
+class RandomGenerator
+{
+    private double left;
+    private double right;
+    Random random = new Random();
+
+    public RandomGenerator(double left, double right) 
+    {
+        this.left = left;
+        this.right = right;
+        
+    }
+
+    public double GetRandomValue()
+    {
+        return left + random.NextDouble() * (right - left);
+    }
+}
 
 class Matrix
 {
-    private double[]? vectorA;
-    private double[]? vectorB;
-    private double[]? vectorC;
-    private double[]? vectorF;
-    private double[]? vectorP;
-    private double[]? vectorQ;
-    private double[]? vectorX;
-    private double[]? vectorSolutions;
-    private int matrixSize;
-    private int numberK;
+    private double[,] matrix;
+    private double[] f;
+    private double[] x;
+    private int size;
+    private int k;
 
-    public Matrix(int matrixSize, int numberK, int left, int right)
+    public Matrix(int size, int k) 
     {
-        this.matrixSize = matrixSize;
-        this.numberK = numberK;
-
-        Random random = new Random();
-
-        vectorA = new double[matrixSize];
-        vectorB = new double[matrixSize];
-        vectorC = new double[matrixSize];
-        vectorF = new double[matrixSize];
-        vectorP = new double[matrixSize];
-        vectorQ = new double[matrixSize];
-        vectorX = new double[matrixSize];
-        vectorSolutions = new double[matrixSize];
-
-        for (int i = 0; i < matrixSize; i++)
-        {
-            vectorX[i] = left + random.Next(left, right);
-        }
-
-        for (int row = 0; row < matrixSize; row++)
-        {
-            for (int col = 0; col < matrixSize; col++)
-            {
-                if (col == numberK - 1)
-                {
-                    vectorQ[row] = left + random.Next(left, right);
-                }
-                
-                if (row == numberK - 1)
-                {
-                    vectorP[col] = left + random.Next(left, right);
-                    if (col == numberK - 1 - 2)
-                    {
-                        vectorC[numberK - 1] = vectorP[numberK - 1 - 2];
-                    }
-                    if (col == numberK - 1 - 1)
-                    {
-                        vectorB[numberK - 1] = vectorP[numberK - 1 - 1];
-                    }
-                    if (col == numberK - 1)
-                    {
-                        vectorA[numberK - 1] = vectorP[numberK - 1];
-                        vectorQ[numberK - 1] = vectorP[numberK - 1];
-                    }
-                }
-            }
-        }
-
-        for (int row = 0; row < matrixSize; row++)
-        {
-            if (row == 0)
-            {
-                vectorA[row] = 0;
-                vectorB[row] = left + random.Next(left, right);
-                vectorC[row] = left + random.Next(left, right);
-                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row];
-            }
-            if ((row >= 1 && row <= numberK - 1 - 3) || (row >= numberK - 1 + 1 && row <= matrixSize - 1 - 1))
-            {
-                vectorA[row] = left + random.Next(left, right);
-                vectorB[row] = left + random.Next(left, right);
-                vectorC[row] = left + random.Next(left, right);
-                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
-            }
-            if (row == matrixSize - 1)
-            {
-                vectorA[row] = left + random.Next(left, right);
-                vectorB[row] = left + random.Next(left, right);
-                vectorC[row] = 0;
-                vectorF[row] = vectorQ[row] * vectorX[numberK - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
-            }
-            if (row >= numberK - 1 - 2 && row <= numberK - 1 - 1)
-            {
-                if (row == numberK - 1 - 2)
-                {
-                    vectorC[row] = vectorQ[row];
-                    vectorA[row] = left + random.Next(left, right);
-                    vectorB[row] = left + random.Next(left, right);
-                }
-                if (row == numberK - 1 - 1)
-                {
-                    vectorB[row] = vectorQ[row];
-                    vectorA[row] = left + random.Next(left, right);
-                    vectorC[row] = left + random.Next(left, right);
-                }
-                
-                vectorF[row] = vectorC[row] * vectorX[matrixSize - 1 - row - 1] + vectorB[row] * vectorX[matrixSize - 1 - row] + vectorA[row] * vectorX[matrixSize - 1 - row + 1];
-            }
-            if (row == numberK - 1)
-            {
-                for (int col = 0; col < matrixSize; col++)
-                {
-                    vectorF[row] += vectorP[col] * vectorX[col];
-                }
-            }
-        }
+        matrix = new double[size, size];
+        f = new double[size];
+        x = new double[size];
+        this.size = size;
+        this.k = k;
     }
-
-    public void FindSolutions()
+    public void Generate(double left, double right)
     {
-        for (int row = 0; row < numberK - 1 - 2; row++)
+        RandomGenerator gen = new RandomGenerator(left, right);
+
+        for (int row = 0; row < size; row++)
         {
-            vectorQ[row] /= vectorB[row];
-            vectorC[row] /= vectorB[row];
-            vectorF[row] /= vectorB[row];
-            vectorB[row] /= vectorB[row];
-
-            vectorQ[row + 1] -= vectorQ[row] * vectorA[row + 1];
-            vectorB[row + 1] -= vectorC[row] * vectorA[row + 1];
-            vectorF[row + 1] -= vectorF[row] * vectorA[row + 1];
-            vectorA[row + 1] -= vectorB[row] * vectorA[row + 1];
-
-            vectorP[numberK - 1] -= vectorQ[row] * vectorP[matrixSize - 1 - row];
-            vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
-            vectorP[matrixSize - 1 - row - 1] -= vectorC[row] * vectorP[matrixSize - 1 - row];
-            vectorF[numberK - 1] -= vectorF[row] * vectorP[matrixSize - 1 - row];
-            vectorP[matrixSize - 1 - row] -= vectorB[row] * vectorP[matrixSize - 1 - row]; 
-        }
-
-        for (int row = matrixSize - 1; row > numberK - 1 + 1; row--)
-        {
-            vectorQ[row] /= vectorB[row];
-            vectorA[row] /= vectorB[row];
-            vectorF[row] /= vectorB[row];
-            vectorB[row] /= vectorB[row];
-
-            vectorQ[row - 1] -= vectorQ[row] * vectorC[row - 1];
-            vectorB[row - 1] -= vectorA[row] * vectorC[row - 1];
-            vectorF[row - 1] -= vectorF[row] * vectorC[row - 1];
-            vectorC[row - 1] -= vectorB[row] * vectorC[row - 1];
-
-            vectorP[numberK - 1] -= vectorQ[row] * vectorP[matrixSize - 1 - row];
-            vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
-            vectorP[matrixSize - 1 - row + 1] -= vectorA[row] * vectorP[matrixSize - 1 - row];
-            vectorF[numberK - 1] -= vectorF[row] * vectorP[matrixSize - 1 - row];
-            vectorP[matrixSize - 1 - row] -= vectorB[row] * vectorP[matrixSize - 1 - row];
-        }
-
-        vectorQ[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
-        vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
-        vectorF[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
-        vectorB[numberK - 1 - 2] /= vectorB[numberK - 1 - 2];
-
-        vectorQ[numberK - 1 - 1] -= vectorQ[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
-        vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
-        vectorF[numberK - 1 - 1] -= vectorF[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
-        vectorA[numberK - 1 - 1] -= vectorB[numberK - 1 - 2] * vectorA[numberK - 1 - 1];
-
-        vectorP[numberK - 1] -= vectorQ[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
-        vectorQ[numberK - 1] = vectorA[numberK - 1] = vectorP[numberK - 1];
-        vectorF[numberK - 1] -= vectorF[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
-        vectorP[numberK - 1 + 1] -= vectorB[numberK - 1 - 2] * vectorP[numberK - 1 + 1];
-
-        vectorC[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
-        vectorF[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
-        vectorQ[numberK - 1 - 1] /= vectorQ[numberK - 1 - 1];
-        vectorB[numberK - 1 - 1] = vectorQ[numberK - 1 - 1];
-
-        vectorB[numberK - 1] -= vectorC[numberK - 1 - 1] * vectorP[numberK - 1];
-        vectorF[numberK - 1] -= vectorF[numberK - 1 - 1] * vectorP[numberK - 1];
-        vectorP[numberK - 1] -= vectorQ[numberK - 1 - 1] * vectorP[numberK - 1];
-        vectorA[numberK - 1] = vectorQ[numberK - 1] = vectorP[numberK - 1];
-
-        vectorA[numberK - 1 + 1] -= vectorC[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
-        vectorF[numberK - 1 + 1] -= vectorF[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
-        vectorQ[numberK - 1 + 1] -= vectorQ[numberK - 1 - 1] * vectorQ[numberK - 1 + 1];
-
-        vectorA[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
-        vectorF[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
-        vectorB[numberK - 1 + 1] /= vectorB[numberK - 1 + 1];
-
-        vectorP[numberK - 1 - 1] -= vectorA[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
-        vectorB[numberK - 1] = vectorP[numberK - 1 - 1];
-        vectorF[numberK - 1] -= vectorF[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
-        vectorP[numberK - 1 - 2] -= vectorB[numberK - 1 + 1] * vectorP[numberK - 1 - 2];
-        vectorC[numberK - 1] = vectorP[numberK - 1 - 2];
-
-        vectorF[numberK - 1] /= vectorB[numberK - 1];
-        vectorB[numberK - 1] /= vectorB[numberK - 1];
-        vectorP[numberK - 1 - 1] = vectorB[numberK - 1];
-
-        vectorF[numberK - 1 - 1] -= vectorF[numberK - 1] * vectorC[numberK - 1 - 1];
-        vectorC[numberK - 1 - 1] -= vectorB[numberK - 1] * vectorC[numberK - 1 - 1];
-
-        vectorF[numberK - 1 - 2] -= vectorF[numberK - 1 - 1] * vectorQ[numberK - 1 - 2];
-        vectorQ[numberK - 1 - 2] -= vectorQ[numberK - 1 - 1] * vectorQ[numberK - 1 - 2];
-        vectorC[numberK - 1 - 2] = vectorQ[numberK - 1 - 2];
-
-        vectorF[numberK - 1 + 1] -= vectorF[numberK - 1] * vectorA[numberK - 1 + 1];
-        vectorA[numberK - 1 + 1] -= vectorB[numberK - 1] * vectorA[numberK - 1 + 1];
-
-        vectorSolutions[numberK - 1 + 1] = vectorF[numberK - 1 - 2];
-        vectorSolutions[numberK - 1] = vectorF[numberK - 1 - 1];
-        vectorSolutions[numberK - 1 - 1] = vectorF[numberK - 1];
-        vectorSolutions[numberK - 1 - 2] = vectorF[numberK - 1 + 1];
-    }
-    
-
-    public void PrintMatrixToFile(StreamWriter sw)
-    {
-        sw.WriteLine("Matrix Size: " + matrixSize);
-        sw.WriteLine("Number K: " + numberK);
-
-        int end_col = matrixSize - 1;
-        for (int row = 0; row < matrixSize; row++)
-        {
-            for (int col = 0; col < matrixSize; col++)
+            for (int col = 0; col < size; col++)
             {
-                if (col == numberK - 1)
+                if (col == k - 1 || row == k - 1)
                 {
-                    sw.Write(String.Format("{0:f1}  ", vectorQ[row]));
+                    matrix[row, col] = gen.GetRandomValue();
                 }
-                else if (row == numberK - 1)
+                else if (row == size - 1 - col)
                 {
-                    sw.Write(String.Format("{0:f1}  ", vectorP[col]));
-                }
-                else if (col == end_col - 1)
-                {
-                    sw.Write(String.Format("{0:f1}  ", vectorC[row]));
-                }
-                else if (col == end_col)
-                {
-                    sw.Write(String.Format("{0:f1}  ", vectorB[row]));
-                }
-                else if (col == end_col + 1)
-                {
-                    sw.Write(String.Format("{0:f1}  ", vectorA[row]));
+                    matrix[row, col] = gen.GetRandomValue();
+                    if (row > 0)
+                    {
+                        matrix[row, col + 1] = gen.GetRandomValue();
+                    }
+                    if (row < size - 1)
+                    {
+                        matrix[row, col - 1] = gen.GetRandomValue();
+                    }
                 }
                 else
                 {
-                    sw.Write(String.Format("{0:f1}  ", 0.0));
+                    matrix[row, col] = 0;
                 }
             }
-            sw.Write(String.Format("  =  {0:f1}  ", vectorF[row]));
-            end_col--;
-            sw.WriteLine();
         }
     }
 
-    public void PrintSolutionToConsole()
+    public void InputFromFile(string path)
     {
-        for (int i = 0; i < matrixSize; i++)
+        using (StreamReader reader = new StreamReader(path))
         {
-            Console.WriteLine(String.Format("X{0} = {1:f1}", i, vectorSolutions[i]));
+            for (int row = 0; row < size; row++)
+            {
+                string line = reader.ReadLine();
+                string[] values = line.Split('\t');
+
+                for (int col = 0; col < size; col++)
+                {
+                    matrix[row, col] = double.Parse(values[col]);
+                }
+            }
+
+            reader.ReadLine();
+
+            for (int i = 0; i < size; i++)
+            {
+                f[i] = double.Parse(reader.ReadLine());
+            }
+        }
+    }
+
+    public void PrintToFile(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            for (int row = 0; row < size; row++)
+            {
+                for (int col = 0; col < size; col++)
+                {
+                    if (matrix[row, col] == 0)
+                    {
+                        writer.Write(string.Format("{0:f4} ", 0.0));
+                    }
+                    else
+                    {
+                        writer.Write(string.Format("{0:f4} ", matrix[row, col]));
+                    }
+
+                    if (col < size - 1)
+                    {
+                        writer.Write(" ");
+                    }
+                }
+
+                writer.WriteLine($" = {f[row]:f4}");
+            }
+            writer.WriteLine();
+        }
+    }
+
+    public void PrintToConsole()
+    {
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
+                if (matrix[row, col] == 0)
+                {
+                    Console.Write(string.Format("{0:f4} ", 0.0));
+                }
+                else
+                {
+                    Console.Write(string.Format("{0:f4} ", matrix[row, col]));
+                }
+                
+                if (col < size - 1)
+                {
+                    Console.Write(" ");
+                }
+            }
+
+            Console.WriteLine($" = {f[row]:f4}");
+        }
+        Console.WriteLine();
+    }
+
+    public void DivideLine(int rowIndex)
+    {
+        double b_element = matrix[rowIndex, size - 1 - rowIndex];
+        if (Math.Abs(b_element) < double.Epsilon)
+        {
+            return;
+        }
+        for (int col = 0; col < size; col++)
+        {
+            matrix[rowIndex, col] /= b_element;
+        }
+        f[rowIndex] /= b_element;
+    }
+
+    public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
+    {
+        double koef = matrix[secondRow, size - 1 - firstRow];
+        for (int col = 0; col < size; col++)
+        {
+            matrix[secondRow, col] -= matrix[firstRow, col] * koef;
+        }
+        f[secondRow] -= f[firstRow] * koef;
+    }
+
+    public void FirstStep()
+    {
+        for (int row = 0; row < k - 2; row++)
+        {
+            DivideLine(row);
+            Subtract(row, row + 1);
+            Subtract(row, k - 1);
+        }
+    }
+
+    public void SecondStep()
+    {
+        for (int row = size - 1; row > k - 3; row--)
+        {
+            DivideLine(row);
+            Subtract(row, row - 1);
+            if (row > k)
+            {
+                Subtract(row, k - 1);
+            }
+        }
+    }
+
+    public void ThirdStep()
+    {
+        for (int row = 0; row < size; row++)
+        {
+            if (row != k - 2 && row != k - 3)
+            {
+                Subtract(k - 2, row);
+            }
+        }
+    }
+
+    public void FourthStep()
+    {
+        for (int row = k - 3; row > 0; row--)
+        {
+            Subtract(row, row - 1);
+        }
+        for (int row = k - 1; row < size - 1; row++)
+        {
+            Subtract(row, row + 1);
         }
     }
 }
