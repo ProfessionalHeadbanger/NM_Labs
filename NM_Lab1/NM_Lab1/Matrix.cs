@@ -47,23 +47,27 @@ class RandomGenerator
 
 class Matrix
 {
-    private double[,] matrix;
-    private double[] f;
-    private double[] f_one;
-    private double[] x;
-    private double[] x_one;
-    private double[] x_expect;
-    private int size;
-    private int k;
-  
+    public double[,] matrix;
+    public double[] f;
+    public double[] f_one;
+    public double[] x;
+    public double[] x_one;
+    public double[] x_expect;
+    public double[] x_generated;
+    public int size;
+    public int k;
+    public double delta;
+    public double accuracy;
+
     public Matrix(int size, int k)
     {
         matrix = new double[size, size];
         f = new double[size];
         f_one = new double[size];
-        x = new double[size];
-        x_one = new double[size];
-        x_expect = new double[size];
+        x = new double[size]; // массив полученных решений
+        x_one = new double[size]; // массив полученных единичных решений
+        x_expect = new double[size]; // массив ожидаемых единичных решений
+        x_generated = new double[size]; // массив сгенерированных решений
         this.size = size;
         this.k = k;
     }
@@ -73,7 +77,7 @@ class Matrix
 
         for (int col = 0; col < size; col++)
         {
-            x_expect[col] = gen.GetRandomValue();
+            x_generated[col] = gen.GetRandomValue();
         }
 
         for (int row = 0; row < size; row++)
@@ -84,23 +88,18 @@ class Matrix
                 {
                     matrix[row, col] = gen.GetRandomValue();
                 }
-                else if (row == size - 1 - col)
+                else if (col == size - 2 - row || col == size - 1 - row || col == size - row)
                 {
                     matrix[row, col] = gen.GetRandomValue();
-                    if (row > 0)
-                    {
-                        matrix[row, col + 1] = gen.GetRandomValue();
-                    }
-                    if (row < size - 1)
-                    {
-                        matrix[row, col - 1] = gen.GetRandomValue();
-                    }
                 }
                 else
                 {
                     matrix[row, col] = 0;
                 }
+                f[row] += x_generated[col] * matrix[row, col];
+                f_one[row] += matrix[row, col];
             }
+            x_expect[row] = 1.0;
         }
     }
 
@@ -163,15 +162,17 @@ class Matrix
     {
         using (StreamWriter writer = new StreamWriter(path))
         {
+            writer.WriteLine("Solutions:");
             for (int row = 0; row < size; row++)
             {
-                writer.Write("x" + row + $" = {x[row]:f16}");
+                writer.Write("x" + (row + 1) + $" = {x[row]:f16}");
                 writer.WriteLine();
             }
             writer.WriteLine();
+            writer.WriteLine("Expected by 1 solutions:");
             for (int row = 0; row < size; row++)
             {
-                writer.Write("x" + row + $" = {x_one[row]:f16}");
+                writer.Write("x" + (row + 1) + $" = {x_one[row]:f16}");
                 writer.WriteLine();
             }
         }
@@ -229,70 +230,18 @@ class Matrix
         f_one[secondRow] -= f_one[firstRow] * koef;
     }
 
-    public void FirstStep()
+    public void AccuracyTest(double[] _x, double[] _x_expect)
     {
-        for (int row = 0; row < k - 2; row++)
-        {
-            DivideLine(row);
-            Subtract(row, row + 1);
-            Subtract(row, k - 1);
-        }
-    }
-
-    public void SecondStep()
-    {
-        for (int row = size - 1; row > k - 3; row--)
-        {
-            DivideLine(row);
-            Subtract(row, row - 1);
-            if (row > k)
-            {
-                Subtract(row, k - 1);
-            }
-        }
-    }
-
-    public void ThirdStep()
-    {
-        for (int row = 0; row < size; row++)
-        {
-            if (row != k - 2 && row != k - 3)
-            {
-                Subtract(k - 2, row);
-            }
-        }
-    }
-
-    public void FourthStep()
-    {
-        for (int row = k - 3; row > 0; row--)
-        {
-            Subtract(row, row - 1);
-        }
-        for (int row = k - 1; row < size - 1; row++)
-        {
-            Subtract(row, row + 1);
-        }
-        for (int row = 0; row < size; row++)
-        {
-            x[row] = f[row];
-            x_one[row] = f_one[row];
-        }
-    }
-
-    public void AccuracyTest()
-    {
-        double delta = 0;
-        double accuracy = 0;
+        delta = 0;
+        accuracy = 0;
         for (int i = 0; i < size; i++)
         {
-            delta = Math.Max(Math.Abs((x_one[i] - x_expect[i])/Math.Max(1, x_one[i])), delta);
-            accuracy = Math.Max(Math.Abs(x_one[i] - 1.0), accuracy);
+            delta = Math.Max(Math.Abs((_x[i] - _x_expect[i]) / Math.Max(1, _x[i])), delta);
+            accuracy = Math.Max(Math.Abs(_x[i] - 1.0), accuracy);
         }
-        PrintAccuracyToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\accuracy_test.txt", delta, accuracy);
     }
 
-    public void PrintAccuracyToFile(string path, double delta, double accuracy)
+    public void PrintAccuracyToFile(string path)
     {
         using (StreamWriter writer = new StreamWriter(path))
         {
