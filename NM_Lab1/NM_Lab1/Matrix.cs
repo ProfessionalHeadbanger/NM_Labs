@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.Design;
 using System.Data;
+using System.Transactions;
 
 class RandomGenerator
 {
@@ -31,11 +32,11 @@ class RandomGenerator
     private double right;
     Random random = new Random();
 
-    public RandomGenerator(double left, double right) 
+    public RandomGenerator(double left, double right)
     {
         this.left = left;
         this.right = right;
-        
+
     }
 
     public double GetRandomValue()
@@ -48,21 +49,32 @@ class Matrix
 {
     private double[,] matrix;
     private double[] f;
+    private double[] f_one;
     private double[] x;
+    private double[] x_one;
+    private double[] x_expect;
     private int size;
     private int k;
-
-    public Matrix(int size, int k) 
+  
+    public Matrix(int size, int k)
     {
         matrix = new double[size, size];
         f = new double[size];
+        f_one = new double[size];
         x = new double[size];
+        x_one = new double[size];
+        x_expect = new double[size];
         this.size = size;
         this.k = k;
     }
     public void Generate(double left, double right)
     {
         RandomGenerator gen = new RandomGenerator(left, right);
+
+        for (int col = 0; col < size; col++)
+        {
+            x_expect[col] = gen.GetRandomValue();
+        }
 
         for (int row = 0; row < size; row++)
         {
@@ -104,7 +116,9 @@ class Matrix
                 for (int col = 0; col < size; col++)
                 {
                     matrix[row, col] = double.Parse(values[col]);
+                    f_one[row] += matrix[row, col];
                 }
+                x_expect[row] = 1.0;
             }
 
             reader.ReadLine();
@@ -126,11 +140,11 @@ class Matrix
                 {
                     if (matrix[row, col] == 0)
                     {
-                        writer.Write(string.Format("{0:f4} ", 0.0));
+                        writer.Write(string.Format("{0:f16} ", 0.0));
                     }
                     else
                     {
-                        writer.Write(string.Format("{0:f4} ", matrix[row, col]));
+                        writer.Write(string.Format("{0:f16} ", matrix[row, col]));
                     }
 
                     if (col < size - 1)
@@ -139,9 +153,27 @@ class Matrix
                     }
                 }
 
-                writer.WriteLine($" = {f[row]:f4}");
+                writer.WriteLine($" = {f[row]:f16}");
             }
             writer.WriteLine();
+        }
+    }
+
+    public void PrintSolutionsToFile(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            for (int row = 0; row < size; row++)
+            {
+                writer.Write("x" + row + $" = {x[row]:f16}");
+                writer.WriteLine();
+            }
+            writer.WriteLine();
+            for (int row = 0; row < size; row++)
+            {
+                writer.Write("x" + row + $" = {x_one[row]:f16}");
+                writer.WriteLine();
+            }
         }
     }
 
@@ -153,20 +185,20 @@ class Matrix
             {
                 if (matrix[row, col] == 0)
                 {
-                    Console.Write(string.Format("{0:f4} ", 0.0));
+                    Console.Write(string.Format("{0:f16} ", 0.0));
                 }
                 else
                 {
-                    Console.Write(string.Format("{0:f4} ", matrix[row, col]));
+                    Console.Write(string.Format("{0:f16} ", matrix[row, col]));
                 }
-                
+
                 if (col < size - 1)
                 {
                     Console.Write(" ");
                 }
             }
 
-            Console.WriteLine($" = {f[row]:f4}");
+            Console.WriteLine($" = {f[row]:f16}");
         }
         Console.WriteLine();
     }
@@ -183,6 +215,7 @@ class Matrix
             matrix[rowIndex, col] /= b_element;
         }
         f[rowIndex] /= b_element;
+        f_one[rowIndex] /= b_element;
     }
 
     public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
@@ -193,6 +226,7 @@ class Matrix
             matrix[secondRow, col] -= matrix[firstRow, col] * koef;
         }
         f[secondRow] -= f[firstRow] * koef;
+        f_one[secondRow] -= f_one[firstRow] * koef;
     }
 
     public void FirstStep()
@@ -238,6 +272,33 @@ class Matrix
         for (int row = k - 1; row < size - 1; row++)
         {
             Subtract(row, row + 1);
+        }
+        for (int row = 0; row < size; row++)
+        {
+            x[row] = f[row];
+            x_one[row] = f_one[row];
+        }
+    }
+
+    public void AccuracyTest()
+    {
+        double delta = 0;
+        double accuracy = 0;
+        for (int i = 0; i < size; i++)
+        {
+            delta = Math.Max(Math.Abs((x_one[i] - x_expect[i])/Math.Max(1, x_one[i])), delta);
+            accuracy = Math.Max(Math.Abs(x_one[i] - 1.0), accuracy);
+        }
+        PrintAccuracyToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\accuracy_test.txt", delta, accuracy);
+    }
+
+    public void PrintAccuracyToFile(string path, double delta, double accuracy)
+    {
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            writer.Write($"delta = {delta:f16}");
+            writer.WriteLine();
+            writer.Write($"accuracy = {accuracy:f16}");
         }
     }
 }

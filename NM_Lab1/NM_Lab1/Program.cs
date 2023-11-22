@@ -2,9 +2,6 @@
 using System.Net.Http.Headers;
 using System.IO;
 
-// Переделать вывод, чтобы все выводилось в один файл (возможно даже убрать вывод промежуточных шагов, оставить только начальную матрицу и решение)
-// Сделать какие то погрешности или че там еще короче хуйню какую то еще сделать
-// Сделать тесты на разные размеры матрицы и разные границы генерации значений
 class Program
 {
     static void Main()
@@ -14,19 +11,22 @@ class Program
         int k = n / 2 + 1;
 
         Matrix m = new Matrix(n, k);
-        m.InputFromFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\test.txt");
-        m.PrintToConsole();
+        m.InputFromFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\test.txt");
+        m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\initialMatrix.txt");
 
         m.FirstStep();
-        m.PrintToConsole();
+        m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\step1.txt");
 
         m.SecondStep();
-        m.PrintToConsole();
+        m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\step2.txt");
 
         m.ThirdStep();
-        m.PrintToConsole();
+        m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\step3.txt");
 
         m.FourthStep();
-        m.PrintToConsole();
+        m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\step4.txt");
+        m.PrintSolutionsToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\solutions.txt");
+
+        m.AccuracyTest();
     }
 }
