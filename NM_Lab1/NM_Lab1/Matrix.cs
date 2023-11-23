@@ -28,56 +28,64 @@ using System.Transactions;
 
 class RandomGenerator
 {
-    private double left;
-    private double right;
+    private decimal left;
+    private decimal right;
     Random random = new Random();
 
-    public RandomGenerator(double left, double right)
+    public RandomGenerator(decimal left, decimal right)
     {
         this.left = left;
         this.right = right;
 
     }
 
-    public double GetRandomValue()
+    //public double GetRandomValue()
+    //{
+    //    return left + random.NextDouble() * (right - left);
+    //}
+
+    public decimal GetRandomDecimalValue()
     {
-        return left + random.NextDouble() * (right - left);
+        var item = new decimal(random.NextDouble());
+        return left + item * (right - left);
     }
 }
 
 class Matrix
 {
-    public double[,] matrix;
-    public double[] f;
-    public double[] f_one;
-    public double[] x;
-    public double[] x_one;
-    public double[] x_expect;
-    public double[] x_generated;
+    public decimal[,] matrix;
+    public decimal[] f;
+    public decimal[] f_one;
+    public decimal[] x;
+    public decimal[] x_one;
+    public decimal[] x_expect;
+    public decimal[] x_generated;
     public int size;
     public int k;
-    public double delta;
-    public double accuracy;
+    public decimal delta;
+    public decimal accuracy;
 
     public Matrix(int size, int k)
     {
-        matrix = new double[size, size];
-        f = new double[size];
-        f_one = new double[size];
-        x = new double[size]; // массив полученных решений
-        x_one = new double[size]; // массив полученных единичных решений
-        x_expect = new double[size]; // массив ожидаемых единичных решений
-        x_generated = new double[size]; // массив сгенерированных решений
+        matrix = new decimal[size, size];
+        f = new decimal[size];
+        f_one = new decimal[size];
+        x = new decimal[size]; // массив полученных решений
+        x_one = new decimal[size]; // массив полученных единичных решений
+        x_expect = new decimal[size]; // массив ожидаемых единичных решений
+        x_generated = new decimal[size]; // массив сгенерированных решений
         this.size = size;
         this.k = k;
     }
-    public void Generate(double left, double right)
+
+    public void Generate(decimal left, decimal right)
     {
         RandomGenerator gen = new RandomGenerator(left, right);
 
         for (int col = 0; col < size; col++)
         {
-            x_generated[col] = gen.GetRandomValue();
+            x_generated[col] = gen.GetRandomDecimalValue();
+            x_expect[col] = 1.0M;
         }
 
         for (int row = 0; row < size; row++)
@@ -86,20 +94,26 @@ class Matrix
             {
                 if (col == k - 1 || row == k - 1)
                 {
-                    matrix[row, col] = gen.GetRandomValue();
+                    matrix[row, col] = gen.GetRandomDecimalValue();
                 }
                 else if (col == size - 2 - row || col == size - 1 - row || col == size - row)
                 {
-                    matrix[row, col] = gen.GetRandomValue();
+                    matrix[row, col] = gen.GetRandomDecimalValue();
                 }
                 else
                 {
                     matrix[row, col] = 0;
                 }
+            }
+        }
+
+        for (int row = 0; row < size; row++)
+        {
+            for (int col = 0; col < size; col++)
+            {
                 f[row] += x_generated[col] * matrix[row, col];
                 f_one[row] += matrix[row, col];
             }
-            x_expect[row] = 1.0;
         }
     }
 
@@ -114,17 +128,17 @@ class Matrix
 
                 for (int col = 0; col < size; col++)
                 {
-                    matrix[row, col] = double.Parse(values[col]);
+                    matrix[row, col] = decimal.Parse(values[col]);
                     f_one[row] += matrix[row, col];
                 }
-                x_expect[row] = 1.0;
+                x_expect[row] = 1.0M;
             }
 
             reader.ReadLine();
 
             for (int i = 0; i < size; i++)
             {
-                f[i] = double.Parse(reader.ReadLine());
+                f[i] = decimal.Parse(reader.ReadLine());
             }
         }
     }
@@ -178,6 +192,19 @@ class Matrix
         }
     }
 
+    public void PrintGeneratedSolutionsToFile(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path))
+        {
+            writer.WriteLine("Generated solutions:");
+            for (int row = 0; row < size; row++)
+            {
+                writer.Write("x" + (row + 1) + $" = {x_generated[row]:f16}");
+                writer.WriteLine();
+            }
+        }
+    }
+
     public void PrintToConsole()
     {
         for (int row = 0; row < size; row++)
@@ -206,11 +233,7 @@ class Matrix
 
     public void DivideLine(int rowIndex)
     {
-        double b_element = matrix[rowIndex, size - 1 - rowIndex];
-        if (Math.Abs(b_element) < double.Epsilon)
-        {
-            return;
-        }
+        decimal b_element = matrix[rowIndex, size - 1 - rowIndex];
         for (int col = 0; col < size; col++)
         {
             matrix[rowIndex, col] /= b_element;
@@ -221,7 +244,7 @@ class Matrix
 
     public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
     {
-        double koef = matrix[secondRow, size - 1 - firstRow];
+        decimal koef = matrix[secondRow, size - 1 - firstRow];
         for (int col = 0; col < size; col++)
         {
             matrix[secondRow, col] -= matrix[firstRow, col] * koef;
@@ -230,14 +253,14 @@ class Matrix
         f_one[secondRow] -= f_one[firstRow] * koef;
     }
 
-    public void AccuracyTest(double[] _x, double[] _x_expect)
+    public void AccuracyTest(decimal[] _x, decimal[] _x_expect)
     {
         delta = 0;
         accuracy = 0;
         for (int i = 0; i < size; i++)
         {
             delta = Math.Max(Math.Abs((_x[i] - _x_expect[i]) / Math.Max(1, _x[i])), delta);
-            accuracy = Math.Max(Math.Abs(_x[i] - 1.0), accuracy);
+            accuracy = Math.Max(Math.Abs(_x[i] - 1.0M), accuracy);
         }
     }
 
