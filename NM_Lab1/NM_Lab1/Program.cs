@@ -54,8 +54,8 @@ class Program
         }
         for (int row = 0; row < m.size; row++)
         {
-            m.x[row] = m.f[row];
-            m.x_one[row] = m.f_one[row];
+            m.x[row] = m.f[m.size - 1 - row];
+            m.x_one[row] = m.f_one[m.size - 1 - row];
         }
     }
 
@@ -72,41 +72,68 @@ class Program
         }
         return size;
     }
+
+    public static void Tests(string inputpath, string outputpath)
+    {
+        StreamReader reader = new StreamReader(inputpath);
+        while (!reader.EndOfStream)
+        {
+            string line = reader.ReadLine();
+            string[] numbers = line.Split(' ');
+            int size = int.Parse(numbers[0]);
+            int k = size / 2 + 1;
+            decimal left = decimal.Parse(numbers[1]);
+            decimal right = decimal.Parse(numbers[2]);
+
+            Matrix matrix = new Matrix(size, k);
+            matrix.Generate(left, right);
+            FirstStep(matrix);
+            matrix.AccuracyTest(matrix.x_one);
+            matrix.InaccuracyTest(matrix.x, matrix.x_generated);
+
+            using (StreamWriter writer = new StreamWriter(outputpath, true))
+            {
+                writer.WriteLine($"Size: {size}; Left: {left}; Right: {right}; Accuracy: {matrix.accuracy:e}; Inaccuracy: {matrix.inaccuracy:e}");
+            }
+        }
+    }
     static void Main()
     {
         bool menu = true;
         while (menu)
         {
-            Console.WriteLine("1) Решить СЛАУ из файла;\n2) Решить сгенерированную СЛАУ;\n3) Выход");
+            Console.WriteLine("1) Решить СЛАУ из файла;\n2) Решить сгенерированную СЛАУ;\n3) Набор тестов;\n4) Выход");
             string choice = Console.ReadLine();
             switch (choice)
             {
                 case "1":
-                    int size = InputSize("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\test.txt");
+                    int size = InputSize("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\variant.txt");
                     Matrix static_m = new Matrix(size, size / 2 + 1);
-                    static_m.InputFromFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\test.txt");
-                    static_m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\initial_static_matrix.txt");
+                    static_m.InputFromFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\variant.txt");
+                    static_m.PrintToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\initial_static_matrix.txt");
                     FirstStep(static_m);
-                    static_m.PrintSolutionsToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\static_matrix_solutions.txt");
-                    static_m.AccuracyTest(static_m.x_one, static_m.x_expect);
-                    static_m.PrintAccuracyToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\static_matrix_accuracy_test.txt");
+                    static_m.PrintSolutionsToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\static_matrix_solutions.txt");
+                    static_m.AccuracyTest(static_m.x_one);
+                    static_m.PrintAccuracy("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\static_matrix_solutions.txt");
                     break;
                 case "2":
                     Console.Write("Размер матрицы: ");
                     int n = Convert.ToInt32(Console.ReadLine());
                     int k = n / 2 + 1;
                     Matrix generated_m = new Matrix(n, k);
-                    generated_m.Generate(1, 10);
-                    generated_m.PrintToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\initial_generated_matrix.txt");
-                    generated_m.PrintGeneratedSolutionsToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_solutions.txt");
+                    generated_m.Generate(-10, 10);
+                    generated_m.PrintToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\initial_generated_matrix.txt");
                     FirstStep(generated_m);
-                    generated_m.PrintSolutionsToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
-                    generated_m.AccuracyTest(generated_m.x, generated_m.x_generated);
-                    generated_m.PrintAccuracyToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_accuracy_test1.txt");
-                    generated_m.AccuracyTest(generated_m.x_one, generated_m.x_expect);
-                    generated_m.PrintAccuracyToFile("C:\\Users\\Всеволод\\Desktop\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_accuracy_test2.txt");
+                    generated_m.PrintSolutionsToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
+                    generated_m.AccuracyTest(generated_m.x_one);
+                    generated_m.InaccuracyTest(generated_m.x, generated_m.x_generated);
+                    generated_m.PrintAccuracy("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
+                    generated_m.PrintInaccuracy("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
                     break;
                 case "3":
+                    Tests("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\tests.txt", "D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\result_tests.txt");
+                    break;
+                case "4":
                     menu = false;
                     break;
                 default:

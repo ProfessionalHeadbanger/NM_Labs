@@ -1,0 +1,9 @@
+Size: 10; Left: -10; Right: 10; Accuracy: 1,300000e-027; Inaccuracy: 3,400000e-026
+Size: 10; Left: -100; Right: 100; Accuracy: 1,000000e-027; Inaccuracy: 3,000000e-026
+Size: 10; Left: -1000; Right: 1000; Accuracy: 2,000000e-027; Inaccuracy: 9,600000e-025
+Size: 100; Left: -10; Right: 10; Accuracy: 4,500000e-027; Inaccuracy: 1,000000e-025
+Size: 100; Left: -100; Right: 100; Accuracy: 1,854000e-025; Inaccuracy: 1,945000e-023
+Size: 100; Left: -1000; Right: 1000; Accuracy: 6,000000e-026; Inaccuracy: 4,200000e-023
+Size: 1000; Left: -10; Right: 10; Accuracy: 2,200000e-025; Inaccuracy: 2,470000e-024
+Size: 1000; Left: -100; Right: 100; Accuracy: 5,000000e-025; Inaccuracy: 1,310000e-023
+Size: 1000; Left: -1000; Right: 1000; Accuracy: 3,860000e-026; Inaccuracy: 9,200000e-023

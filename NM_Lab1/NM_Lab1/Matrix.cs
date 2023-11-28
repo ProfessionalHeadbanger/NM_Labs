@@ -39,11 +39,6 @@ class RandomGenerator
 
     }
 
-    //public double GetRandomValue()
-    //{
-    //    return left + random.NextDouble() * (right - left);
-    //}
-
     public decimal GetRandomDecimalValue()
     {
         var item = new decimal(random.NextDouble());
@@ -58,11 +53,10 @@ class Matrix
     public decimal[] f_one;
     public decimal[] x;
     public decimal[] x_one;
-    public decimal[] x_expect;
     public decimal[] x_generated;
     public int size;
     public int k;
-    public decimal delta;
+    public decimal inaccuracy;
     public decimal accuracy;
 
     public Matrix(int size, int k)
@@ -72,7 +66,6 @@ class Matrix
         f_one = new decimal[size];
         x = new decimal[size]; // массив полученных решений
         x_one = new decimal[size]; // массив полученных единичных решений
-        x_expect = new decimal[size]; // массив ожидаемых единичных решений
         x_generated = new decimal[size]; // массив сгенерированных решений
         this.size = size;
         this.k = k;
@@ -85,7 +78,6 @@ class Matrix
         for (int col = 0; col < size; col++)
         {
             x_generated[col] = gen.GetRandomDecimalValue();
-            x_expect[col] = 1.0M;
         }
 
         for (int row = 0; row < size; row++)
@@ -117,6 +109,28 @@ class Matrix
         }
     }
 
+    public void DivideLine(int rowIndex)
+    {
+        decimal b_element = matrix[rowIndex, size - 1 - rowIndex];
+        for (int col = 0; col < size; col++)
+        {
+            matrix[rowIndex, col] /= b_element;
+        }
+        f[rowIndex] /= b_element;
+        f_one[rowIndex] /= b_element;
+    }
+
+    public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
+    {
+        decimal koef = matrix[secondRow, size - 1 - firstRow];
+        for (int col = 0; col < size; col++)
+        {
+            matrix[secondRow, col] -= matrix[firstRow, col] * koef;
+        }
+        f[secondRow] -= f[firstRow] * koef;
+        f_one[secondRow] -= f_one[firstRow] * koef;
+    }
+
     public void InputFromFile(string path)
     {
         using (StreamReader reader = new StreamReader(path))
@@ -131,7 +145,6 @@ class Matrix
                     matrix[row, col] = decimal.Parse(values[col]);
                     f_one[row] += matrix[row, col];
                 }
-                x_expect[row] = 1.0M;
             }
 
             reader.ReadLine();
@@ -183,94 +196,40 @@ class Matrix
                 writer.WriteLine();
             }
             writer.WriteLine();
-            writer.WriteLine("Expected by 1 solutions:");
-            for (int row = 0; row < size; row++)
-            {
-                writer.Write("x" + (row + 1) + $" = {x_one[row]:f16}");
-                writer.WriteLine();
-            }
         }
     }
 
-    public void PrintGeneratedSolutionsToFile(string path)
+    public void AccuracyTest(decimal[] _x)
     {
-        using (StreamWriter writer = new StreamWriter(path))
-        {
-            writer.WriteLine("Generated solutions:");
-            for (int row = 0; row < size; row++)
-            {
-                writer.Write("x" + (row + 1) + $" = {x_generated[row]:f16}");
-                writer.WriteLine();
-            }
-        }
-    }
-
-    public void PrintToConsole()
-    {
-        for (int row = 0; row < size; row++)
-        {
-            for (int col = 0; col < size; col++)
-            {
-                if (matrix[row, col] == 0)
-                {
-                    Console.Write(string.Format("{0:f16} ", 0.0));
-                }
-                else
-                {
-                    Console.Write(string.Format("{0:f16} ", matrix[row, col]));
-                }
-
-                if (col < size - 1)
-                {
-                    Console.Write(" ");
-                }
-            }
-
-            Console.WriteLine($" = {f[row]:f16}");
-        }
-        Console.WriteLine();
-    }
-
-    public void DivideLine(int rowIndex)
-    {
-        decimal b_element = matrix[rowIndex, size - 1 - rowIndex];
-        for (int col = 0; col < size; col++)
-        {
-            matrix[rowIndex, col] /= b_element;
-        }
-        f[rowIndex] /= b_element;
-        f_one[rowIndex] /= b_element;
-    }
-
-    public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
-    {
-        decimal koef = matrix[secondRow, size - 1 - firstRow];
-        for (int col = 0; col < size; col++)
-        {
-            matrix[secondRow, col] -= matrix[firstRow, col] * koef;
-        }
-        f[secondRow] -= f[firstRow] * koef;
-        f_one[secondRow] -= f_one[firstRow] * koef;
-    }
-
-    public void AccuracyTest(decimal[] _x, decimal[] _x_expect)
-    {
-        delta = 0;
         accuracy = 0;
         for (int i = 0; i < size; i++)
         {
-            delta = Math.Max(Math.Abs((_x[i] - _x_expect[i]) / Math.Max(1, _x[i])), delta);
             accuracy = Math.Max(Math.Abs(_x[i] - 1.0M), accuracy);
         }
     }
 
-    public void PrintAccuracyToFile(string path)
+    public void InaccuracyTest(decimal[] _x, decimal[] _x_expect)
     {
-        using (StreamWriter writer = new StreamWriter(path))
+        inaccuracy = 0;
+        for (int i = 0; i < size; i++)
         {
-            writer.Write($"delta = {delta:f16}");
-            writer.WriteLine();
-            writer.Write($"accuracy = {accuracy:f16}");
+            inaccuracy = Math.Max(Math.Abs((_x[i] - _x_expect[i]) / Math.Max(1, _x[i])), inaccuracy);
+        }
+    }
+
+    public void PrintAccuracy(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path, true))
+        {
+            writer.WriteLine($"Accuracy: {accuracy:e}");
+        }
+    }
+
+    public void PrintInaccuracy(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path, true))
+        {
+            writer.WriteLine($"Inaccuracy: {inaccuracy:e}");
         }
     }
 }
