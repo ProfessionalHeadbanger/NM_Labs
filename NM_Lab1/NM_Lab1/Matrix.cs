@@ -199,6 +199,20 @@ class Matrix
         }
     }
 
+    public void PrintGeneratedSolutionsToFile(string path)
+    {
+        using (StreamWriter writer = new StreamWriter(path, true))
+        {
+            writer.WriteLine("Generated solutions:");
+            for (int row = 0; row < size; row++)
+            {
+                writer.Write("x" + (row + 1) + $" = {x_generated[row]:f16}");
+                writer.WriteLine();
+            }
+            writer.WriteLine();
+        }
+    }
+
     public void AccuracyTest(decimal[] _x)
     {
         accuracy = 0;

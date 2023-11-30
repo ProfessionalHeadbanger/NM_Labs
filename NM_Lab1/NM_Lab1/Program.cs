@@ -125,6 +125,7 @@ class Program
                     generated_m.PrintToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\initial_generated_matrix.txt");
                     FirstStep(generated_m);
                     generated_m.PrintSolutionsToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
+                    generated_m.PrintGeneratedSolutionsToFile("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
                     generated_m.AccuracyTest(generated_m.x_one);
                     generated_m.InaccuracyTest(generated_m.x, generated_m.x_generated);
                     generated_m.PrintAccuracy("D:\\Лабы\\ЧМ\\NM_Lab1\\NM_Lab1\\generated_matrix_solutions.txt");
