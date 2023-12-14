@@ -1,0 +1,4 @@
+N: 30; L: 30; Left: -10; Right: 10; Inaccuracy: 4,000000e-026
+N: 50; L: 50; Left: -10; Right: 10; Inaccuracy: 8,866000e-025
+N: 300; L: 300; Left: -10; Right: 10; Inaccuracy: 8,925390e-023
+N: 500; L: 500; Left: -10; Right: 10; Inaccuracy: 9,515900e-023

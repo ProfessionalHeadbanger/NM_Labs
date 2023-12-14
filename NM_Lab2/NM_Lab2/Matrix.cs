@@ -56,6 +56,80 @@ class Matrix
         this.L = L;
     }
 
+    public void GenerateAndMultiply(decimal left, decimal right)
+    {
+        RandomGenerator gen = new RandomGenerator(left, right);
+
+        decimal[,] matrix_L = new decimal[N, 2*L - 1];
+        decimal[,] matrix_U = new decimal[N, 2*L - 1];
+
+        for (int col = 0; col < N; col++)
+        {
+            x_generated[col] = gen.GetRandomDecimalValue();
+        }
+
+        for (int row = 0; row < N; row++)
+        {
+            matrix[row, L - 1] = gen.GetRandomDecimalValue();
+        }
+
+        int j = L - 1;
+        for (int row = N - 1; row >= 0; row--)
+        {
+            for (int col = L; col < 2 * L - 1; col++)
+            {
+                if (col > j)
+                {
+                    matrix_L[row, col] = 0;
+                }
+                else
+                {
+                    matrix_L[row, col] = gen.GetRandomDecimalValue();
+                }
+            }
+            j++;
+        }
+
+        int i = L - 1;
+        for (int row = 0; row < N; row++)
+        {
+            for (int col = 0; col < L - 1; col++)
+            {
+                if (col < i)
+                {
+                    matrix_U[row, col] = 0;
+                }
+                else
+                {
+                    matrix_U[row, col] = gen.GetRandomDecimalValue();
+                }
+            }
+            i--;
+        }
+
+        for (int row = 0; row < N; row++)
+        {
+            for (int col = L - 1 - row; col < 2 * L - 1 - row; col++)
+            {
+                for (int k = 0; k < N; k++)
+                {
+                    matrix[row, col] += matrix_L[row, L - 1 + k - row] * matrix_U[k, col - k + row];
+                }
+            }
+        }
+
+        for (int row = 0; row < N; row++)
+        {
+            for (int col = 0; col < 2 * L - 1; col++)
+            {
+                if (matrix[row, col] != 0)
+                {
+                    f[row] += matrix[row, col] * x_generated[row + col - L + 1];
+                }
+            }
+        }
+    }
+
     public void Generate(decimal left, decimal right)
     {
         RandomGenerator gen = new RandomGenerator(left, right);
@@ -65,10 +139,15 @@ class Matrix
             x_generated[col] = gen.GetRandomDecimalValue();
         }
 
-        int i = L - 1;
-        for (int row = 0; row < N / 2; row++)
+        for (int row = 0; row < N; row++)
         {
-            for (int col = 0; col < 2 * L - 1; col++)
+            matrix[row, L - 1] = gen.GetRandomDecimalValue();
+        }
+
+        int i = L - 1;
+        for (int row = 0; row < N; row++)
+        {
+            for (int col = 0; col < L - 1; col++)
             {
                 if (col < i)
                 {
@@ -83,11 +162,11 @@ class Matrix
         }
 
         int j = L - 1;
-        for (int row = N - 1; row > N / 2 - 1; row--)
+        for (int row = N - 1; row >= 0; row--)
         {
-            for (int col = 2 * L - 2; col >= 0; col--)
+            for (int col = L; col < 2 * L - 1; col++)
             {
-                if (col > 2 * L - 2 - j)
+                if (col > j)
                 {
                     matrix[row, col] = 0;
                 }
@@ -96,14 +175,17 @@ class Matrix
                     matrix[row, col] = gen.GetRandomDecimalValue();
                 }
             }
-            j--;
+            j++;
         }
 
         for (int row = 0; row < N; row++)
         {
             for (int col = 0; col < 2 * L - 1; col++)
             {
-                f[row] += matrix[row, col] * x_generated[row + col - L - 1];
+                if (matrix[row, col] != 0)
+                {
+                    f[row] += matrix[row, col] * x_generated[row + col - L + 1];
+                }
             }
         }
     }
@@ -118,7 +200,7 @@ class Matrix
         f[rowIndex] /= koef;
     }
 
-    public void Subtract(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
+    public void SubtractDirectStroke(int firstRow, int secondRow) // из второй вычитается первая, умноженная на коэффициент во второй
     {
         int position = L - 1 - secondRow + firstRow;
         decimal koef = matrix[secondRow, position];
@@ -127,6 +209,14 @@ class Matrix
             matrix[secondRow, position] -= koef * matrix[firstRow, col];
             position++;
         }
+        f[secondRow] -= f[firstRow] * koef;
+    }
+
+    public void SubtractBackwardStroke(int firstRow, int secondRow)
+    {
+        int position = L - 1 - secondRow + firstRow;
+        decimal koef = matrix[secondRow, position];
+        matrix[secondRow, position] -= koef * matrix[firstRow, L - 1];
         f[secondRow] -= f[firstRow] * koef;
     }
 
