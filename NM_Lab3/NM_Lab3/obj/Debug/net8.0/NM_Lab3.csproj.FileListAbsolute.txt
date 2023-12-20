@@ -1,0 +1,14 @@
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\bin\Debug\net8.0\NM_Lab3.exe
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\bin\Debug\net8.0\NM_Lab3.deps.json
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\bin\Debug\net8.0\NM_Lab3.runtimeconfig.json
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\bin\Debug\net8.0\NM_Lab3.dll
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\bin\Debug\net8.0\NM_Lab3.pdb
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.GeneratedMSBuildEditorConfig.editorconfig
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.AssemblyInfoInputs.cache
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.AssemblyInfo.cs
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.csproj.CoreCompileInputs.cache
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.dll
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\refint\NM_Lab3.dll
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.pdb
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\NM_Lab3.genruntimeconfig.cache
+D:\Лабы\ЧМ\NM_Lab3\NM_Lab3\obj\Debug\net8.0\ref\NM_Lab3.dll
