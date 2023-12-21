@@ -8,6 +8,7 @@
         {
             matrix.diagonalElements[i] = matrix.matrix[i, i];
             rotationMatrix[i, i] = 1.0M;
+            matrix.eigenVectors[i, i] = 1.0M;
         }
 
         for (int iteration = 0; iteration < maxIterations; iteration++)
@@ -28,6 +29,7 @@
             rotationMatrix[q, p] = -(decimal)Math.Sin((double)theta);
 
             matrix.matrix = matrix.Multiply(matrix.matrix, rotationMatrix);
+            matrix.eigenVectors = matrix.Multiply(matrix.eigenVectors, rotationMatrix);
             matrix.diagonalElements[p] = matrix.matrix[p, p];
             matrix.diagonalElements[q] = matrix.matrix[q, q];
         }
@@ -77,6 +79,10 @@
                     RightJacobiMethod(generated_matrix, tolerance, maxIterations);
                     generated_matrix.PrintLambdaToFile("D:\\Лабы\\ЧМ\\NM_Lab3\\NM_Lab3\\generated_matrix_values.txt");
                     generated_matrix.PrintGeneratedLambdaToFile("D:\\Лабы\\ЧМ\\NM_Lab3\\NM_Lab3\\generated_matrix_values.txt");
+                    generated_matrix.AccuracyEvaluationTest(generated_matrix.diagonalElements, generated_matrix.generated_lambda);
+                    generated_matrix.PrintEvaluation("D:\\Лабы\\ЧМ\\NM_Lab3\\NM_Lab3\\generated_matrix_values.txt");
+                    generated_matrix.AccuracyMeasureTest(generated_matrix.initial_matrix, generated_matrix.diagonalElements, generated_matrix.eigenVectors);
+                    generated_matrix.PrintMeasure("D:\\Лабы\\ЧМ\\NM_Lab3\\NM_Lab3\\generated_matrix_values.txt");
                     break;
                 case "2":
 
