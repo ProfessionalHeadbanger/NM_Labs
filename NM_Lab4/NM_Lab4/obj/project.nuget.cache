@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "PQ4AXbyEcnL4oIyHrI+Jv6Hg9E9CjIn4ZSG5ldUPdu94iyh6l5oSBxdYNCq4VcbQkSA17tYxT41u7ivQnxByjQ==",
+  "success": true,
+  "projectFilePath": "E:\\Лабы\\ЧМ\\NM_Lab4\\NM_Lab4\\NM_Lab4.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\nices\\.nuget\\packages\\mathnet.numerics\\5.0.0\\mathnet.numerics.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

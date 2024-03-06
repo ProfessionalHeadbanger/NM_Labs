@@ -1,0 +1,17 @@
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\NM_Lab4.exe
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\NM_Lab4.deps.json
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\NM_Lab4.runtimeconfig.json
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\NM_Lab4.dll
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\NM_Lab4.pdb
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.GeneratedMSBuildEditorConfig.editorconfig
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.AssemblyInfoInputs.cache
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.AssemblyInfo.cs
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.csproj.CoreCompileInputs.cache
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.dll
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\refint\NM_Lab4.dll
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.pdb
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.genruntimeconfig.cache
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\ref\NM_Lab4.dll
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\bin\Debug\net8.0\MathNet.Numerics.dll
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.csproj.AssemblyReference.cache
+E:\Лабы\ЧМ\NM_Lab4\NM_Lab4\obj\Debug\net8.0\NM_Lab4.csproj.Up2Date
