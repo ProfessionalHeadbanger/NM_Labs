@@ -1,0 +1,14 @@
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\bin\Debug\net8.0\NM_Lab6.exe
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\bin\Debug\net8.0\NM_Lab6.deps.json
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\bin\Debug\net8.0\NM_Lab6.runtimeconfig.json
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\bin\Debug\net8.0\NM_Lab6.dll
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\bin\Debug\net8.0\NM_Lab6.pdb
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.GeneratedMSBuildEditorConfig.editorconfig
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.AssemblyInfoInputs.cache
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.AssemblyInfo.cs
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.csproj.CoreCompileInputs.cache
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.dll
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\refint\NM_Lab6.dll
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.pdb
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\NM_Lab6.genruntimeconfig.cache
+E:\Лабы\ЧМ\NM_Lab6\NM_Lab6\obj\Debug\net8.0\ref\NM_Lab6.dll
